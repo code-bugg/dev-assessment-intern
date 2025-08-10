@@ -1,4 +1,6 @@
 import { employees } from "../data/employees";
+import { Schedule, Shift, Employee } from "../types";
+
 
 import * as React from "react";
 import Table from '@mui/material/Table';
@@ -13,29 +15,21 @@ import MenuItem from '@mui/material/MenuItem';
 import { Button } from "@mui/material";
 /*  Above are the imports needed for the Material-UI table and select components.   */
 
-import { createClient} from "@supabase/supabase-js";
-/*  For supabase database integration   */
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey)
-
-
-const options = ["Early", "Late", "Off"];
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
+const days: string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const options: Shift[] = ["Off", "Early", "Late"];
 
 export default function Home() {
-  const rows = employees.length;
-  const cols = days.length;
-  const [cellValues, setCellValues] = React.useState(   
-    Array.from({ length: rows }, () => Array(cols).fill("Off"))
+  const rows: number = employees.length;
+  const cols: number = days.length;
+  const defaultDayValue: Shift = "Off";
+  const [cellValues, setCellValues] = React.useState<Shift[][]>(
+    Array.from({ length: rows }, () => Array(cols).fill(defaultDayValue))
   );
   /* Initialize the table cells with "Off" and create the cell useState hook */
   const [error, setError] = React.useState<string | null>(null);
 
-  const handleChange = (row: number, col: number, value: string) => {
-    const newValues = cellValues.map(arr => [...arr]);
+  const handleChange = (row: number, col: number, value: Shift) => {
+    const newValues: Shift[][] = cellValues.map(arr => [...arr]);
     newValues[row][col] = value;
     /* function to update the cell value when a user selects a shift */
     setCellValues(newValues);
@@ -43,7 +37,7 @@ export default function Home() {
 
   const save = () => {
     const schedule = employees.map((emp, rowIdx) => {
-    const shifts: Record<string, string> = {};
+    const shifts: Record<string, Shift> = {};
     
     days.forEach((day, colIdx) => {
         shifts[day] = cellValues[rowIdx][colIdx];
@@ -52,11 +46,11 @@ export default function Home() {
     });
 
 
-    let errorMsg = "";  /* Initialize an empty error message string,
+    let errorMsg: string = "";  /* Initialize an empty error message string,
                            an error mesage will be concatenated to it */
 
     employees.forEach((emp, rowIdx) => {
-      const shiftCount = cellValues[rowIdx].filter(v => v !== "Off").length;
+      const shiftCount: number = cellValues[rowIdx].filter(v => v !== "Off").length;
       if (shiftCount > 5) {
         errorMsg += `Employee ${emp.name} (ID: ${emp.id}) has ${shiftCount} shifts. Max allowed is 5.\n`;
       }
@@ -93,7 +87,7 @@ export default function Home() {
                   <TableCell key={day}>
                     <Select
                       value={cellValues[rowIdx][colIdx]}
-                      onChange={e => handleChange(rowIdx, colIdx, e.target.value as string)}
+                      onChange={e => handleChange(rowIdx, colIdx, e.target.value as Shift)}
                       size="small"
                       variant="outlined"
                       sx={{ minWidth: 80 }}
