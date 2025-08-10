@@ -12,7 +12,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { Button } from "@mui/material";
+import Button from "@mui/material/Button";
 /*  Above are the imports needed for the Material-UI table and select components.   */
 
 const days: string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -57,16 +57,14 @@ export default function Home() {
     });
 
     setError(errorMsg.trim());
-    /* unforntunately, I couldn't get the supabase to work
-        so I will just log the schedule to the console */
     if (!errorMsg) {
       console.log(JSON.stringify(schedule, null, 2));
     }
   };
 
   return (
-    <main className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Shift Planner</h1>
+    <main>
+      <h1>Shift Planner</h1>
       <TableContainer component={Paper} sx={{ maxWidth: 1100 }}>
         <Table>
           <TableHead>
@@ -103,16 +101,16 @@ export default function Home() {
           </TableBody>
         </Table>
       </TableContainer>
-      <div className="my-4">
+      <div>
         <Button
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          variant="text"
           onClick={save}
         >
           Save
         </Button>
       </div>
       {error && (
-        <div className="text-red-600 whitespace-pre-line mb-4">{error}</div>
+        <div>{error}</div>
       )}
     </main>
   );
